@@ -1,9 +1,15 @@
 body {
     margin: 0;
+    font-family: "Old Standard TT";
+}
+h1 {
+  text-align: center;
+  margin-top: 1em;
+  margin-bottom: 0;
 }
 #canvas {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -11,5 +17,4 @@ body {
 #score {
   text-align: center;
   font-size: 140px;
-  font-family: "Antic Slab", serif;
 }
