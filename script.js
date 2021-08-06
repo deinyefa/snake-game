@@ -11,8 +11,11 @@ let snake = [
   { x: 160, y: 200 },
 ];
 let changeingDirection = false;
+let foodX, foodY;
+let score = 0;
 
 main();
+generateFood();
 document.addEventListener("keydown", changeDirection);
 
 function main() {
@@ -21,6 +24,7 @@ function main() {
 
   setTimeout(function onTick() {
     clearCanvas();
+    drawFood();
     moveSnake();
     drawSnake();
 
@@ -46,8 +50,17 @@ function moveSnake() {
     x: snake[0].x + dx,
     y: snake[0].y + dy,
   };
+  const hasEaten = snake[0].x === foodX && snake[0].y === foodY;
+
   snake.unshift(head);
-  snake.pop();
+
+  if (hasEaten) {
+    ++score;
+    document.getElementById("score").innerText = score;
+    generateFood();
+  } else {
+    snake.pop();
+  }
 }
 function changeDirection(e) {
   const LEFT_ARROW = 37;
@@ -61,22 +74,40 @@ function changeDirection(e) {
     goingRight = dx === 10,
     goingLeft = dx === -10;
 
-    if (keyPressed === LEFT_ARROW && !goingRight) {
-      dx = -10;
-      dy = 0;
-    }
-    if (keyPressed === RIGHT_ARROW && !goingLeft) {
-      dx = 10;
-      dy = 0;
-    }
-    if (keyPressed === UP_ARROW && !goingDown) {
-      dx = 0;
-      dy = -10;
-    }
-    if (keyPressed === DOWN_ARROW && !goingUp) {
-      dx = 0;
-      dy = 10;
-    }
+  if (keyPressed === LEFT_ARROW && !goingRight) {
+    dx = -10;
+    dy = 0;
+  }
+  if (keyPressed === RIGHT_ARROW && !goingLeft) {
+    dx = 10;
+    dy = 0;
+  }
+  if (keyPressed === UP_ARROW && !goingDown) {
+    dx = 0;
+    dy = -10;
+  }
+  if (keyPressed === DOWN_ARROW && !goingUp) {
+    dx = 0;
+    dy = 10;
+  }
+}
+function randomFood(min, max) {
+  return Math.round((Math.random() * (max - min) + min) / 10) * 10;
+}
+function generateFood() {
+  foodX = randomFood(0, canvas.width - 10);
+  foodY = randomFood(0, canvas.height - 10);
+
+  snake.forEach((body) => {
+    // check if snake has eaten
+    const eaten = body.x == foodX && body.y == foodY;
+    // generate more food if snake has eaten
+    if (eaten) generateFood();
+  });
+}
+function drawFood() {
+  ctx.fillStyle = "lightgreen";
+  ctx.fillRect(foodX, foodY, 10, 10);
 }
 function gameEnded() {
   const snakeHead = snake[0];
@@ -87,9 +118,9 @@ function gameEnded() {
   }
 
   const hitLeftWall = snakeHead.x < 0;
-  const hitRightWall = snakeHead.x > canvas.width - 20;
+  const hitRightWall = snakeHead.x > canvas.width - 10;
   const hitTopWall = snakeHead.y < 0;
-  const hitBottomWall = snakeHead.y > canvas.height - 20;
+  const hitBottomWall = snakeHead.y > canvas.height - 10;
 
   return hitLeftWall || hitRightWall || hitBottomWall || hitTopWall;
 }
